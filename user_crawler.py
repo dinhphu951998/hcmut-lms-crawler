@@ -122,9 +122,10 @@ class UserCrawler(LmsCrawler):
                 
                 for anchor in course_anchors:
                     href = anchor.get("href", "")
-                    if href and "/course/view.php" in href:
-                        full_url = self.build_url(href)
-                        course_links.append(full_url)
+                    teaching_course_id = self.extract_id_from_url(href, "course")
+                    full_url = self.build_url(f"enrol/index.php?id={teaching_course_id}")
+                    course_links.append(full_url)
+                        
         
         user_info = {
             "user_id": user_id,

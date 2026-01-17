@@ -15,6 +15,10 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 
+# Disable SSL warnings when verify=False is used
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
 
 class LmsCrawler:
     """Base class for LMS crawling operations."""
@@ -47,7 +51,7 @@ class LmsCrawler:
         for attempt in range(max_retries):
             try:
                 self.logger.info(f"Fetching: {url}")
-                response = self.session.get(url, timeout=30)
+                response = self.session.get(url, timeout=30, verify=False)
                 response.raise_for_status()
                 return response.text
             except requests.RequestException as e:

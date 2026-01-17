@@ -47,6 +47,7 @@ class CourseCrawler(LmsCrawler):
                 html_content = f.read()
         else:
             # Fetch the page
+            course_url = self.build_url(f"enrol/index.php?id={course_id}")
             html_content = self.fetch_page(course_url)
             if not html_content:
                 self.logger.error(f"Failed to fetch course {course_id}")
@@ -77,7 +78,7 @@ class CourseCrawler(LmsCrawler):
         
         # Extract course name
         course_name = ""
-        coursename_div = soup.find("div", class_="coursename")
+        coursename_div = soup.find("h3", class_="coursename")
         if coursename_div:
             course_name = self.normalize_text(coursename_div.get_text())
         
@@ -93,7 +94,7 @@ class CourseCrawler(LmsCrawler):
             teacher_anchors = teachers_ul.find_all("a")
             for anchor in teacher_anchors:
                 href = anchor.get("href", "")
-                if href and "/user/view.php" in href:
+                if href and "/user/profile.php" in href:
                     full_url = self.build_url(href)
                     teacher_links.append(full_url)
         
