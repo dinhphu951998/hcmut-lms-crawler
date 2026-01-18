@@ -3,8 +3,8 @@ User Crawler module for HCMUT LMS Crawler.
 Handles parsing and crawling of user profile pages.
 """
 from typing import List, Dict, Optional
-from lms_crawler import LmsCrawler
-from html_saver import HtmlSaver
+from crawler.lms_crawler import LmsCrawler
+from utils.html_saver import HtmlSaver
 
 
 class UserCrawler(LmsCrawler):

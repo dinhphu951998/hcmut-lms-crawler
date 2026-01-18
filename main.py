@@ -5,11 +5,11 @@ Coordinates all crawling operations with multi-threading support.
 import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Set
-from config import Config
-from html_saver import HtmlSaver
-from semester_crawler import SemesterCrawler
-from course_crawler import CourseCrawler
-from user_crawler import UserCrawler
+from utils.config import Config
+from utils.html_saver import HtmlSaver
+from crawler.semester_crawler import SemesterCrawler
+from crawler.course_crawler import CourseCrawler
+from crawler.user_crawler import UserCrawler
 
 
 # Configure logging

@@ -4,8 +4,8 @@ Handles parsing and crawling of semester pages.
 """
 import re
 from typing import List, Dict, Optional
-from lms_crawler import LmsCrawler
-from html_saver import HtmlSaver
+from crawler.lms_crawler import LmsCrawler
+from utils.html_saver import HtmlSaver
 
 
 class SemesterCrawler(LmsCrawler):
@@ -30,12 +30,19 @@ class SemesterCrawler(LmsCrawler):
         Returns:
             List of semester dictionaries with url, category_id, and metadata
         """
-        course_list_url = self.build_url("/course/")
-        html_content = self.fetch_page(course_list_url)
+        if self.html_saver.file_exists("semesters", "discover_semester_result"):
+            self.logger.info("Using cached discover_semester_result.html")
+            file_path = self.html_saver.get_file_path("semesters", "discover_semester_result")
+            try:
+                with open(file_path, "r", encoding="utf-8") as f:
+                    html_content = f.read()
+            except Exception as e:
+                self.logger.error(f"Failed to read discover_semester_result.html: {e}")
+                html_content = None           
         
         if not html_content:
-            self.logger.error("Failed to fetch course list page")
-            return []
+            course_list_url = self.build_url("/course/")
+            html_content = self.fetch_page(course_list_url)
         
         soup = self.parse_html(html_content)
         if not soup:
@@ -81,8 +88,6 @@ class SemesterCrawler(LmsCrawler):
                 "full_text": option_text
             }
 
-            return [semester_info] # Temp for testing
-            
             semesters.append(semester_info)
             self.logger.info(f"Discovered semester: {option_text} (ID: {category_id})")
         
