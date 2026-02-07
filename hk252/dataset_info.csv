@@ -1,0 +1,4 @@
+dataset_name,total_records,columns
+Course,3821,"id, name, teachers, course_code, semester, program_code, program"
+Slot,4580,"code, name, credit, program, size, language, teacher, dayOfWeek, slot, room, branch, weeks"
+User Course,148951,"course_id, course_name, teacher_name, course_code, semester, program_code, program, user_id, user_name, role, email, country, city, timezone, is_teacher"
