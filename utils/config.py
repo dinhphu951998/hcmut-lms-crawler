@@ -25,6 +25,9 @@ class Config:
         # Load optional variables with defaults
         self.number_of_workers = int(os.getenv("NUMBER_OF_WORKERS", "1"))
         self.output_dir = os.getenv("OUTPUT_DIR", "./")
+        self.min_user_id = int(os.getenv("MIN_USER_ID", "0"))
+        self.max_user_id = int(os.getenv("MAX_USER_ID", "0"))
+        self.batch_size = int(os.getenv("BATCH_SIZE", "1000"))
         
         # Validate configuration
         self._validate()

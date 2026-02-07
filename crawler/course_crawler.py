@@ -86,7 +86,8 @@ class CourseCrawler(LmsCrawler):
         teachers_text = ""
         teachers_ul = soup.find("ul", class_="teachers")
         if teachers_ul:
-            teachers_text = self.normalize_text(teachers_ul.get_text())
+            teacher_items = teachers_ul.find_all("a")
+            teachers_text = ", ".join([self.normalize_text(li.get_text()) for li in teacher_items])
         
         # Extract teacher links
         teacher_links = []

@@ -30,6 +30,7 @@ class SemesterCrawler(LmsCrawler):
         Returns:
             List of semester dictionaries with url, category_id, and metadata
         """
+        html_content = None
         if self.html_saver.file_exists("semesters", "discover_semester_result"):
             self.logger.info("Using cached discover_semester_result.html")
             file_path = self.html_saver.get_file_path("semesters", "discover_semester_result")
@@ -38,7 +39,6 @@ class SemesterCrawler(LmsCrawler):
                     html_content = f.read()
             except Exception as e:
                 self.logger.error(f"Failed to read discover_semester_result.html: {e}")
-                html_content = None           
         
         if not html_content:
             course_list_url = self.build_url("/course/")

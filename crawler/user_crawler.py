@@ -56,6 +56,11 @@ class UserCrawler(LmsCrawler):
             if not html_content:
                 self.logger.error(f"Failed to fetch user {user_id}")
                 return None
+
+            alert = self.parse_html(html_content).find("div", class_="alert")
+            if alert:
+                self.logger.warning(f"Error alert found for user {user_id}, skipping")
+                return None
             
             # Save the HTML
             file_path = self.html_saver.save_html("users", user_id, html_content)
@@ -65,7 +70,7 @@ class UserCrawler(LmsCrawler):
         user_info = self.extract_user_info(html_content, user_id)
         return user_info
     
-    def extract_user_info(self, html_content: str, user_id: str) -> Dict[str, any]:
+    def extract_user_info(self, html_content: str, user_id: str) -> Optional[Dict[str, any]]:
         """
         Extract user information from HTML.
         
@@ -78,7 +83,13 @@ class UserCrawler(LmsCrawler):
         """
         soup = self.parse_html(html_content)
         if not soup:
-            return {"user_id": user_id, "course_links": []}
+            return None
+
+        # Check for error alert
+        alert = soup.find("div", class_="alert")
+        if alert:
+            self.logger.warning(f"Error alert found for user {user_id}, skipping")
+            return None
         
         # Extract teacher name from page-header-headings
         teacher_name = ""
@@ -106,7 +117,7 @@ class UserCrawler(LmsCrawler):
                 dds = first_section.find_all("dd")
                 
                 for dt, dd in zip(dts, dds):
-                    key = self.normalize_text(dt.get_text())
+                    key = self.normalize_description_title(dt.get_text())
                     value = self.normalize_text(dd.get_text())
                     if key:
                         profile_details[key] = value
@@ -116,9 +127,15 @@ class UserCrawler(LmsCrawler):
         if profile_tree:
             sections = profile_tree.find_all("section", recursive=False)
             if len(sections) > 1:
+
+                valid_str_contained = []
+                invalid_str_contained = ["_video"]
                 # Section 1 contains course profiles
                 course_section = sections[1]
-                course_anchors = course_section.find_all("a")
+                course_anchors = [a for a in course_section.find_all("a") if not any(invalid_str in a.get_text().lower() for invalid_str in invalid_str_contained)]
+
+                # get top 10 only
+                course_anchors = course_anchors[:10]
                 
                 for anchor in course_anchors:
                     href = anchor.get("href", "")
@@ -137,6 +154,18 @@ class UserCrawler(LmsCrawler):
         
         self.logger.info(f"User {user_id}: {teacher_name}, {len(course_links)} courses")
         return user_info
+
+    def normalize_description_title(self, dt: str) -> str:
+        if ("email" in dt.lower()):
+            return "email"
+        elif ("country" in dt.lower()):
+            return "country"
+        elif ("city" in dt.lower()):
+            return "city"
+        elif ("timezone" in dt.lower()):
+            return "timezone"
+        return "undefined_description_title"
+
     
     def extract_course_links_from_file(self, user_id: str) -> List[str]:
         """
@@ -161,4 +190,3 @@ class UserCrawler(LmsCrawler):
         except Exception as e:
             self.logger.error(f"Failed to read user file {user_id}: {e}")
             return []
-
