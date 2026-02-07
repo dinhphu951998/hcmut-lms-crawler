@@ -2,6 +2,11 @@ courses/
 semesters/
 users/
 .vscode/
+all_courses.json
+all_users.json
+users_courses.json
+course_time.json
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
